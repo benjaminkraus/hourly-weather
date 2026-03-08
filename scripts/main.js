@@ -5,8 +5,10 @@ const margin = { top: 20, right: 30, bottom: 40, left: 40 };
 
 async function fetchData() {
     try {
+        console.log('Fetching weather data...');
         const response = await fetch(url);
         const text = await response.text();
+        console.log('Weather data fetched.');
         const parser = new DOMParser();
         const xmlDoc = parser.parseFromString(text, "application/xml");
 
