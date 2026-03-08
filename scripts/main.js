@@ -1,6 +1,6 @@
 const url = 'https://forecast.weather.gov/MapClick.php?lat=42.2002&lon=-71.4242&FcstType=digitalDWML';
 let weatherData = null;
-let svg, g, x, y, line, xAxis, yAxis, xLabel, yLabel;
+let svg, g, x, y, line, xAxis, yAxis, xGrid, yGrid, xLabel, yLabel;
 const margin = { top: 20, right: 30, bottom: 40, left: 40 };
 
 async function fetchData() {
@@ -38,6 +38,11 @@ function initGraph() {
     x = d3.scaleTime();
     y = d3.scaleLinear();
 
+    xGrid = g.append("g")
+        .attr("class", "grid");
+    yGrid = g.append("g")
+        .attr("class", "grid");
+
     xAxis = g.append("g");
     yAxis = g.append("g");
 
@@ -71,10 +76,23 @@ function updateGraph() {
     y.domain([d3.min(weatherData, d => d.temp) - 5, d3.max(weatherData, d => d.temp) + 5])
      .range([height, 0]);
 
+    const xTicks = Math.max(2, width / 80);
     xAxis.attr("transform", `translate(0,${height})`)
-         .call(d3.axisBottom(x).ticks(Math.max(2, width / 80)));
+         .call(d3.axisBottom(x).ticks(xTicks));
 
     yAxis.call(d3.axisLeft(y));
+
+    xGrid.attr("transform", `translate(0,${height})`)
+         .call(d3.axisBottom(x)
+             .ticks(xTicks)
+             .tickSize(-height)
+             .tickFormat("")
+         );
+
+    yGrid.call(d3.axisLeft(y)
+             .tickSize(-width)
+             .tickFormat("")
+         );
 
     const lineGenerator = d3.line()
         .x(d => x(d.time))
